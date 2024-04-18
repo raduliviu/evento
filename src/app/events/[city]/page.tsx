@@ -1,19 +1,14 @@
 import EventsList from '@/components/events-list';
 import H1 from '@/components/h1';
-import { EventoEventType } from '@/lib/types';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 type EventsPageProps = {
   params: { city: string };
 };
 
-export default async function EventsPage({ params }: EventsPageProps) {
+export default function EventsPage({ params }: EventsPageProps) {
   const city = params.city;
-
-  const response = await fetch(
-    `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
-  );
-  const events: EventoEventType[] = await response.json();
-
   const capitalizedCity = city.charAt(0).toUpperCase() + city.slice(1);
 
   return (
@@ -22,7 +17,9 @@ export default async function EventsPage({ params }: EventsPageProps) {
         {city === 'all' ? 'All Events' : `Events in ${capitalizedCity}`}
       </H1>
 
-      <EventsList events={events} />
+      <Suspense fallback={<Loading />}>
+        <EventsList city={city} />
+      </Suspense>
     </main>
   );
 }
