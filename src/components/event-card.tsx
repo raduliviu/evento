@@ -1,16 +1,41 @@
+'use client';
+
 import { EventoEventType } from '@/lib/types';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRef } from 'react';
 
 type EventCardProps = {
   event: EventoEventType;
 };
 
+const MotionLink = motion(Link);
+
 export default function EventCard({ event }: EventCardProps) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['0 1', '1.5 1'],
+  });
+  const scaleProgress = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+  const opacityProgress = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
+
   return (
-    <Link
+    <MotionLink
+      ref={ref}
       href={`/event/${event.slug}`}
       className='flex-1 basis-80 h-[380px] max-w-[500px]'
+      style={{
+        // @ts-ignore
+        scale: scaleProgress,
+        // @ts-ignore
+        opacity: opacityProgress,
+      }}
+      initial={{
+        opacity: 0,
+        scale: 0.8,
+      }}
     >
       <section className='w-full h-full flex flex-col bg-white/5 rounded-xl overflow-hidden relative state-effects'>
         <Image
@@ -39,6 +64,6 @@ export default function EventCard({ event }: EventCardProps) {
           </p>
         </section>
       </section>
-    </Link>
+    </MotionLink>
   );
 }
