@@ -5,11 +5,17 @@ import Loading from './loading';
 import { capitalizeWord } from '@/lib/utils';
 import { Metadata } from 'next';
 
-type EventsPageProps = {
+type Props = {
   params: { city: string };
 };
 
-export function generateMetadata({ params }: EventsPageProps): Metadata {
+type EventsPageProps = Props & {
+  searchParams: {
+    [key: string]: string | string[] | undefined;
+  };
+};
+
+export function generateMetadata({ params }: Props): Metadata {
   const city = params.city;
 
   return {
@@ -18,8 +24,9 @@ export function generateMetadata({ params }: EventsPageProps): Metadata {
   };
 }
 
-export default function EventsPage({ params }: EventsPageProps) {
+export default function EventsPage({ params, searchParams }: EventsPageProps) {
   const city = params.city;
+  const page = searchParams.page ?? 1;
 
   return (
     <main className='flex flex-col items-center py-24 px-[20px] min-h-[110vh]'>
@@ -27,8 +34,8 @@ export default function EventsPage({ params }: EventsPageProps) {
         {city === 'all' ? 'All Events' : `Events in ${capitalizeWord(city)}`}
       </H1>
 
-      <Suspense fallback={<Loading />}>
-        <EventsList city={city} />
+      <Suspense key={city + page} fallback={<Loading />}>
+        <EventsList city={city} page={+page} />
       </Suspense>
     </main>
   );
