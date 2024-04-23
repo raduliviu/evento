@@ -2,6 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { z } from 'zod';
+
+const searchTextSchema = z
+  .string()
+  .min(1)
+  .regex(/^[^@\/=:]*$/, {
+    message: 'Must not contain @, /, =, : or $ characters',
+  });
 
 export default function SearchForm() {
   const [searchText, setSearchText] = useState('');
@@ -10,7 +18,15 @@ export default function SearchForm() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    router.push(`/events/${searchText}`);
+    const parsedSearchText = searchTextSchema.safeParse(searchText);
+
+    if (!parsedSearchText.success) {
+      throw new Error(
+        'Invalid search term: ' + parsedSearchText.error.errors[0].message
+      );
+    }
+
+    router.push(`/events/${parsedSearchText}`);
   };
 
   return (
