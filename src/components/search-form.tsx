@@ -26,7 +26,7 @@ export default function SearchForm() {
       );
     }
 
-    router.push(`/events/${parsedSearchText}`);
+    router.push(`/events/${parsedSearchText.data}`);
   };
 
   return (
